@@ -10,6 +10,16 @@ import { logger } from 'src/logger';
 export class IndexRoute {
   private readonly _prefixRoute = '/';
   private readonly _router: Router;
+  private readonly _authorRepository = new AuthorRepository();
+  private readonly _bookRepository = new BookRepository();
+  private readonly _authorDomain = new AuthorDomain(
+    this._authorRepository,
+    this._bookRepository
+  );
+  private readonly _bookDomain = new BookDomain(
+    this._bookRepository,
+    this._authorRepository
+  );
 
   get router() {
     return this._router;
@@ -27,13 +37,9 @@ export class IndexRoute {
         message: '[API] Connected...'
       });
     });
-    const authorRepository = new AuthorRepository();
-    const bookRepository = new BookRepository();
-    const authorDomain = new AuthorDomain(authorRepository, bookRepository);
-    const authorRoute = new AuthorRoute(this._router, authorDomain);
+    const authorRoute = new AuthorRoute(this._router, this._authorDomain);
     authorRoute.routes();
-    const bookDomain = new BookDomain(bookRepository, authorRepository);
-    const bookRoute = new BookRoute(this._router, bookDomain);
+    const bookRoute = new BookRoute(this._router, this._bookDomain);
     bookRoute.routes();
 
     logger.info('[API] Routes are initialized');
