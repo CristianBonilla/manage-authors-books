@@ -1,0 +1,70 @@
+{
+  "name": "manage-autors-books",
+  "version": "1.0.0",
+  "description": "Manage autors and books",
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:CristianBonilla/manage-authors-books.git"
+  },
+  "author": {
+    "name": "Cristian Camilo Bonilla",
+    "email": "cristiancamilo10_95@outlook.com",
+    "url": "https://www.linkedin.com/in/cristian-bonilla95"
+  },
+  "keywords": [
+    "NodeJs",
+    "TypeScript",
+    "MongoDb",
+    "Express"
+  ],
+  "license": "MIT",
+  "private": true,
+  "engines": {
+    "node": ">=16"
+  },
+  "scripts": {
+    "start": "cross-env NODE_ENV=production node -r ts-node/register/transpile-only -r tsconfig-paths/register ./dist/main.js",
+    "build": "del-cli ./dist && tsc -p ./tsconfig.json",
+    "pro": "yarn run build && yarn run start",
+    "dev": "cross-env NODE_ENV=development nodemon ./nodemon.json",
+    "lint": "tslint --project ./tsconfig.json ./src/**/**.ts",
+    "watch": "yarn run build --watch"
+  },
+  "dependencies": {
+    "async": "^3.2.4",
+    "body-parser": "^1.20.2",
+    "compression": "^1.7.4",
+    "cookie-parser": "^1.4.6",
+    "cors": "^2.8.5",
+    "dotenv": "^16.1.4",
+    "express": "^4.18.2",
+    "express-myconnection": "^1.0.4",
+    "get-port": "~5.1.1",
+    "helmet": "^7.0.0",
+    "moment": "^2.29.4",
+    "mongoose": "^7.3.0",
+    "morgan": "^1.10.0",
+    "nconf": "^0.12.0",
+    "winston": "^3.9.0"
+  },
+  "devDependencies": {
+    "@types/async": "^3.2.20",
+    "@types/body-parser": "^1.19.2",
+    "@types/compression": "^1.7.2",
+    "@types/cookie-parser": "^1.4.3",
+    "@types/cors": "^2.8.13",
+    "@types/express": "^4.17.17",
+    "@types/express-myconnection": "^1.0.34",
+    "@types/morgan": "^1.9.4",
+    "@types/nconf": "^0.10.3",
+    "@types/node": "^20.3.1",
+    "chai": "^4.3.7",
+    "cross-env": "^7.0.3",
+    "del-cli": "^5.0.0",
+    "nodemon": "^2.0.22",
+    "ts-node": "^10.9.1",
+    "tsconfig-paths": "^4.2.0",
+    "tslib": "^2.5.3",
+    "typescript": "^5.1.3"
+  }
+}
