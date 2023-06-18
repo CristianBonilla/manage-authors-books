@@ -15,11 +15,29 @@ export class BookRepository {
     return book;
   }
 
+  addBookRange(books: Book[]) {
+    return BookModel.insertMany(books);
+  }
+
   async addAuthorToBook(bookId: Types.ObjectId, authorId: Types.ObjectId) {
     await BookModel.updateOne(
       { _id: bookId },
       { $addToSet: { authors: authorId } }
     ).exec();
+  }
+
+  async addAuthorsToBook(bookId: Types.ObjectId, authorIds: Types.ObjectId[]) {
+    await BookModel.updateOne(
+      { _id: bookId },
+      { $addToSet: { authors: { $each: authorIds } } }
+    );
+  }
+
+  async addAuthorToBooks(bookIds: Types.ObjectId[], authorId: Types.ObjectId) {
+    await BookModel.updateMany(
+      { _id: { $in: bookIds } },
+      { $addToSet: { authors: authorId } }
+    );
   }
 
   findBookById(bookId: Types.ObjectId) {

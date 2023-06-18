@@ -12,11 +12,10 @@ export class BookDomain {
 
   async addBook(book: Book) {
     const addedBook = await this._bookRepository.addBook(book);
-    for (const author of book.authors) {
-      const addedAuthor = await this._authorRepository.addAuthor(author);
-      await this._authorRepository.addBookToAuthor(addedAuthor._id, addedBook._id);
-      await this._bookRepository.addAuthorToBook(addedBook._id, addedAuthor._id);
-    }
+    const addedAuthorRange = await this._authorRepository.addAuthorRange(book.authors);
+    const authorIds = addedAuthorRange.map(({ _id }) => _id);
+    await this._bookRepository.addAuthorsToBook(addedBook._id, authorIds);
+    await this._authorRepository.addBookToAuthors(authorIds, addedBook._id);
 
     return this._bookRepository.findBookById(addedBook._id);
   }
