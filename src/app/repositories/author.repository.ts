@@ -28,14 +28,14 @@ export class AuthorRepository {
     await AuthorModel.updateOne(
       { _id: authorId },
       { $addToSet: { books: { $each: bookIds } } }
-    );
+    ).exec();
   }
 
   async addBookToAuthors(authorIds: Types.ObjectId[], bookId: Types.ObjectId) {
     await AuthorModel.updateMany(
       { _id: { $in: authorIds } },
       { $addToSet: { books: bookId } }
-    );
+    ).exec();
   }
 
   findAuthorById(authorId: Types.ObjectId) {

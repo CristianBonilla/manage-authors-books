@@ -30,14 +30,14 @@ export class BookRepository {
     await BookModel.updateOne(
       { _id: bookId },
       { $addToSet: { authors: { $each: authorIds } } }
-    );
+    ).exec();
   }
 
   async addAuthorToBooks(bookIds: Types.ObjectId[], authorId: Types.ObjectId) {
     await BookModel.updateMany(
       { _id: { $in: bookIds } },
       { $addToSet: { authors: authorId } }
-    );
+    ).exec();
   }
 
   findBookById(bookId: Types.ObjectId) {
