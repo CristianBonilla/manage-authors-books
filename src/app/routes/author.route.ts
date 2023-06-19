@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import { AuthorDomain } from '@domain/author.domain';
 import { Author } from '@interfaces/author';
+import { getErrorMessage } from '@utils/error.util';
 
 export class AuthorRoute {
   private readonly _prefixRoute = '/author';
@@ -14,51 +15,51 @@ export class AuthorRoute {
 
   routes() {
     const route = this._router.route(this._prefixRoute);
-    route.post(async (request, response) => {
-      const author: Author = request.body;
-      try {
-        const addedAuthor = await this._authorDomain.addAuthor(author);
-        response.status(200)
-          .send({
-            status: 'OK',
-            statusCode: 200,
-            data: {
-              author: addedAuthor
-            }
-          });
-      } catch (error) {
-        response.status(400)
-          .send({
-            status: 'BadRequest',
-            statusCode: 400,
-            errors: [
-              error ?? 'Some error occurred while creating the Book'
-            ]
-          });
-      }
+    route.post((request, response) => {
+      const author = request.body as Author;
+      this._authorDomain.addAuthor(author)
+        .then(author =>
+          response.status(200)
+            .send({
+              status: 'OK',
+              statusCode: 200,
+              data: {
+                author
+              }
+            })
+        ).catch(error =>
+          response.status(400)
+            .send({
+              status: 'BadRequest',
+              statusCode: 400,
+              errors: [
+                getErrorMessage(error, 'Some error occurred while creating the Book')
+              ]
+            })
+        );
     });
 
-    route.get(async (_request, response) => {
-      try {
-        const authors = await this._authorDomain.getAuthors();
-        response.status(200)
-          .send({
-            status: 'OK',
-            statusCode: 200,
-            data: {
-              authors
-            }
-          });
-      } catch (error) {
-        response.status(400)
-          .send({
-            status: 'BadRequest',
-            statusCode: 400,
-            errors: [
-              error ?? 'Could not find authors'
-            ]
-          });
-      }
+    route.get((_request, response) => {
+      this._authorDomain.getAuthors()
+        .then(authors =>
+          response.status(200)
+            .send({
+              status: 'OK',
+              statusCode: 200,
+              data: {
+                authors
+              }
+            })
+        ).catch(error =>
+          response.status(400)
+            .send({
+              status: 'BadRequest',
+              statusCode: 400,
+              errors: [
+                getErrorMessage(error, 'Could not find authors')
+              ]
+            })
+        );
     });
   }
 

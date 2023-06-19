@@ -32,7 +32,7 @@ export class IndexRoute {
 
   private routes() {
     const route = this._router.route(this._prefixRoute);
-    route.get((_request, response, _next) => {
+    route.get((_request, response) => {
       response.status(200).send({
         message: '[API] Connected...'
       });

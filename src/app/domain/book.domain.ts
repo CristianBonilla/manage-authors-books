@@ -26,7 +26,7 @@ export class BookDomain {
 
   async getAveragePagesPerChapter(bookId: string) {
     if (!ObjectIdIsValid(bookId)) {
-      throw `ObjectId "${bookId}" is invalid`;
+      throw new Error(`ObjectId "${bookId}" is invalid`);
     }
 
     return await this._bookRepository.getAveragePagesPerChapter(

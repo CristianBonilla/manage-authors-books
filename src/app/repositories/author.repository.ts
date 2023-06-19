@@ -46,7 +46,7 @@ export class AuthorRepository {
 
   getAuthors() {
     return AuthorModel.find()
-      .populate('books', "-authors")
+      .populate('books', '-authors')
       .exec();
   }
 }

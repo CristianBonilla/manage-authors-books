@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import { BookDomain } from '@domain/book.domain';
 import { Book } from '@interfaces/book';
+import { getErrorMessage } from '@utils/error.util';
 
 export class BookRoute {
   private readonly _prefixRoute = '/book';
@@ -14,58 +15,57 @@ export class BookRoute {
 
   routes() {
     const route = this._router.route(this._prefixRoute);
-    route.post(async (request, response) => {
-      const book: Book = request.body;
-      try {
-        const addedBook = await this._bookDomain.addBook(book);
-        response.status(200)
-          .send({
-            status: 'OK',
-            statusCode: 200,
-            data: {
-              book: addedBook
-            }
-          });
-      } catch (error) {
-        response.status(400)
-          .send({
-            status: 'BadRequest',
-            statusCode: 400,
-            errors: [
-              error ?? 'Some error occurred while creating the Book'
-            ]
-          });
-      }
+    route.post((request, response) => {
+      const book = request.body as Book;
+      this._bookDomain.addBook(book)
+        .then(book =>
+          response.status(200)
+            .send({
+              status: 'OK',
+              statusCode: 200,
+              data: {
+                book
+              }
+            })
+        ).catch(error =>
+          response.status(400)
+            .send({
+              status: 'BadRequest',
+              statusCode: 400,
+              errors: [
+                getErrorMessage(error, 'Some error occurred while creating the Book')
+              ]
+            })
+        );
     });
 
-    route.get(async (_request, response) => {
-      try {
-        const books = await this._bookDomain.getBooks();
-        response.status(200)
-          .send({
-            status: 'OK',
-            statusCode: 200,
-            data: {
-              books
-            }
-          });
-      } catch (error) {
-        response.status(400)
-          .send({
-            status: 'BadRequest',
-            statusCode: 400,
-            errors: [
-              error ?? 'Could not find books'
-            ]
-          });
-      }
+    route.get((_request, response) => {
+      this._bookDomain.getBooks()
+        .then(books =>
+          response.status(200)
+            .send({
+              status: 'OK',
+              statusCode: 200,
+              data: {
+                books
+              }
+            })
+        ).catch(error =>
+          response.status(400)
+            .send({
+              status: 'BadRequest',
+              statusCode: 400,
+              errors: [
+                getErrorMessage(error, 'Could not find books')
+              ]
+            })
+        );
     });
 
-    this._router.get(`${this._prefixRoute}/:bookId`, async (request, response) => {
+    this._router.get(`${this._prefixRoute}/:bookId`, (request, response) => {
       const { bookId } = request.params;
-      try {
-        const averagePagesPerChapter = await this._bookDomain.getAveragePagesPerChapter(bookId);
-        if (!!averagePagesPerChapter) {
+      this._bookDomain.getAveragePagesPerChapter(bookId)
+        .then(averagePagesPerChapter =>
           response.status(200)
             .send({
               status: 'OK',
@@ -73,18 +73,17 @@ export class BookRoute {
               data: {
                 averagePagesPerChapter
               }
-            });
-        }
-      } catch (error) {
-        response.status(400)
-          .send({
-            status: 'BadRequest',
-            statusCode: 400,
-            errors: [
-              error
-            ]
-          });
-      }
+            })
+        ).catch(error =>
+          response.status(400)
+            .send({
+              status: 'BadRequest',
+              statusCode: 400,
+              errors: [
+                getErrorMessage(error)
+              ]
+            })
+        );
     });
   }
 

@@ -11,30 +11,37 @@ import compression from 'compression';
 import cors from 'cors';
 import { mongoConnect } from '@config/database';
 import { IndexRoute } from '@routes/.';
-import { ServerMessageHandler } from '@interfaces/server';
+import { ServerError, ServerMessageHandler } from '@interfaces/server';
 import { logger } from 'src/logger';
 
 export class Server {
   private readonly _app: Express;
 
-  constructor(private handler?: ServerMessageHandler) {
+  constructor(private handler: ServerMessageHandler) {
     this._app = express();
   }
 
   async start() {
-    const port = nconf.get('PORT') || await getPort({
+    const port = nconf.get('PORT') as number || await getPort({
       port: [3000, 3001, 3002]
     });
     const server = http.createServer(this._app);
-    server.listen(port, async () => {
+    server.listen(port, () => {
       logger.info(`[SERVER] Listening on port "${port}"`);
-      if (!!this.handler) {
-        this.config();
-        await mongoConnect();
-        this.routes();
-        this.handler(null, `[SERVER] Server connected in: http://localhost:${port}`);
-      }
+      this.load()
+        .then(() =>
+          this.handler(null, `[SERVER] Server connected in: http://localhost:${port}`)
+        ).catch(error =>
+          this.handler(error, null)
+        );
     });
+  }
+
+  private async load() {
+    this.config();
+    this.publicDirectory();
+    await mongoConnect();
+    this.routes();
   }
 
   private config() {
@@ -45,7 +52,6 @@ export class Server {
     this._app.use(cors());
     this._app.use(bodyParser.urlencoded({ extended: true }));
     this._app.use(bodyParser.json({ type: '*/*' }));
-    this.publicDirectory();
   }
 
   private routes() {
@@ -56,12 +62,12 @@ export class Server {
   private publicDirectory() {
     const publicDirectory = path.resolve(__dirname, './../../public');
     this._app.use(express.static(publicDirectory));
-    this._app.use((error: any, _request: Request, response: Response, next: NextFunction) => {
-      response.status(error.status || 500);
-      response.json({
-        message: error.message,
-        error: nconf.get('NODE_ENV') === 'development' ? error : {}
-      });
+    this._app.use((error: ServerError, _request: Request, response: Response, next: NextFunction) => {
+      response.status(error.status || 500)
+        .json({
+          message: error.message,
+          error: nconf.get('NODE_ENV') === 'development' ? error : {}
+        });
       next(error);
     });
     logger.info('[SERVER] Public directory initialized');

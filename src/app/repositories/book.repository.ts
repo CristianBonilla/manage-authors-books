@@ -61,6 +61,6 @@ export class BookRepository {
       };
     }
 
-    throw 'Could not get average pages per chapter';
+    throw new Error('Could not get average pages per chapter');
   }
 }
