@@ -14,21 +14,25 @@
   "keywords": [
     "NodeJs",
     "TypeScript",
-    "MongoDb",
+    "Mongoose",
     "Express"
   ],
   "license": "MIT",
   "private": true,
   "engines": {
-    "node": ">=16"
+    "node": ">=16.20.0",
+    "npm": ">=8.19.2",
+    "yarn": ">=1.22.5"
   },
+  "engineStrict": true,
   "scripts": {
-    "start": "cross-env NODE_ENV=production node -r ts-node/register/transpile-only -r tsconfig-paths/register ./dist/main.js",
+    "start": "cross-env NODE_ENV=development node -r ts-node/register/transpile-only -r tsconfig-paths/register ./dist/main.js",
+    "start:pro": "cross-env NODE_ENV=production node -r ts-node/register/transpile-only -r tsconfig-paths/register ./dist/main.js",
     "build": "del-cli ./dist && tsc -p ./tsconfig.json",
-    "pro": "yarn run build && yarn run start",
+    "pro": "yarn run build && yarn run start:pro",
     "dev": "cross-env NODE_ENV=development nodemon ./nodemon.json",
-    "lint": "tslint --project ./tsconfig.json ./src/**/**.ts",
-    "watch": "yarn run build --watch"
+    "watch": "yarn run build --watch",
+    "lint": "tslint --project ./tsconfig.json ./src/**/**.ts"
   },
   "dependencies": {
     "async": "^3.2.4",
